@@ -9,8 +9,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
 
-notes = [];
-
 app.get("/", function(req, res) {
     res.sendFile(path.join(__dirname, "/public/index.html"));
 });
@@ -23,20 +21,25 @@ app.get("/api/notes", function(req, res) {
     fs.readFile("./db/db.json", function(err, data) {
         if(err) throw err;
 
-        return data;
+        return res.json(JSON.parse(data));
     });
 });
 
 app.post("/api/notes", function(req, res) {
-    console.log("In the server");
     const newNote = req.body;
 
-    notes.push(newNote);
-    fs.writeFile("./db/db.json", JSON.stringify(notes), function(err) {
+    fs.readFile("./db/db.json", function(err, data) {
         if(err) throw err;
-    });
 
-    res.json(newNote);
+        const storedNotes = JSON.parse(data);
+        storedNotes.push(newNote);
+
+        fs.writeFile("./db/db.json", JSON.stringify(storedNotes), function(err) {
+            if(err) throw err;
+        });
+    
+        res.json(newNote);
+    });
 });
 
 app.delete("/api/notes/:id", function(req, res) {
