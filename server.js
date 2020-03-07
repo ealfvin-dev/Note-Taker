@@ -33,7 +33,12 @@ app.post("/api/notes", function(req, res) {
 
         const storedNotes = JSON.parse(data);
 
-        newNote.id = storedNotes.length + 1;
+        if(storedNotes.length > 0) {
+            newNote.id = storedNotes[storedNotes.length - 1].id + 1;
+        }
+        else {
+            newNote.id = 1;
+        }
         storedNotes.push(newNote);
 
         fs.writeFile("./db/db.json", JSON.stringify(storedNotes), function(err) {
@@ -45,9 +50,27 @@ app.post("/api/notes", function(req, res) {
 });
 
 app.delete("/api/notes/:id", function(req, res) {
-    const id = req.params.id;
+    const deleteID = req.params.id;
     
-    //Delete note
+    fs.readFile("./db/db.json", function(err, data) {
+        if(err) throw err;
+
+        let notes = JSON.parse(data);
+        let finalNotes = [];
+
+        for(note of notes) {
+            if(note.id != deleteID) {
+                finalNotes.push(note);
+                console.log(note);
+            }
+        }
+
+        fs.writeFile("./db/db.json", JSON.stringify(finalNotes), function(err) {
+            if(err) throw err;
+        });
+        
+        return res.json(finalNotes);
+    });
 });
 
 app.listen(PORT, function() {
