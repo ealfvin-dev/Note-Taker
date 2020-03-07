@@ -32,13 +32,15 @@ app.post("/api/notes", function(req, res) {
         if(err) throw err;
 
         const storedNotes = JSON.parse(data);
+
+        newNote.id = storedNotes.length + 1;
         storedNotes.push(newNote);
 
         fs.writeFile("./db/db.json", JSON.stringify(storedNotes), function(err) {
             if(err) throw err;
         });
     
-        res.json(newNote);
+        return res.json(newNote);
     });
 });
 
@@ -46,7 +48,7 @@ app.delete("/api/notes/:id", function(req, res) {
     const id = req.params.id;
     
     //Delete note
-})
+});
 
 app.listen(PORT, function() {
     console.log("App listening on PORT " + PORT);
