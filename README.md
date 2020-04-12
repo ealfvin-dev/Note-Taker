@@ -1,2 +1,2 @@
 # Note-Taker
-Create and store notes on a Node server
+Note storage app that runs on a Node.js server
